@@ -308,16 +308,16 @@ const CAR={name:"Renault Clio", trip:"Trip ended · today, 2:14 pm"};
 const SEVERITIES={
   cleanliness:{label:"Cleanliness", short:"Cleanliness", icon:"sparkle", catClass:"cat-cleanliness", desc:"Dirty, or a smell",
     exTitle:"Cigarette smell in the cabin", exText:"There was a strong stale-cigarette smell, especially in the front seats.",
-    consequence:"gave the car a deep re-clean and confirmed it's fresh again"},
+    consequence:"The car's had a proper re-clean"},
   safety:{label:"Safety", short:"Safety", icon:"alert", catClass:"cat-safety", desc:"Mechanical or unsafe",
     exTitle:"Warning light on the dash", exText:"An orange engine warning light came on during the trip.",
-    consequence:"had it checked over and confirmed it's all good to drive again", offMarket:true},
+    consequence:"It's been checked over — all good", offMarket:true},
   equipment:{label:"Equipment", short:"Equipment", icon:"clipboard", catClass:"cat-equipment", desc:"Missing / not as listed",
     exTitle:"No phone holder as listed", exText:"The listing mentioned a phone holder but there wasn't one in the car.",
-    consequence:"sorted the listing so the next renter knows exactly what to expect"},
+    consequence:"The listing's fixed for the next renter"},
   billing:{label:"Billing", short:"Billing", icon:"euro", catClass:"cat-billing", desc:"A charge looks wrong",
     exTitle:"A charge I didn't expect", exText:"There was a cleaning fee on my trip that I wasn't expecting.",
-    consequence:"looked into the charge with the owner and cleared it up for you"},
+    consequence:"We've cleared up the charge with the owner"},
 };
 const OUTCOMES={resolved:"Resolved", noaction:"No fix needed", escalated:"Our team steps in"};
 const TIERS={first:"First-time", repeat:"Repeat", trusted:"Trusted"};
@@ -364,18 +364,17 @@ function icon(n){const I={
 /* ===================== COPY (warm, two beats) ===================== */
 function ackText(){ const s=sev();
   let c = state.report.photos
-    ? `Thanks for flagging this, ${RENTER.first} — and for the photos, they really help. 💛 We'll take care of it and let you know the moment it's sorted.`
-    : `Thanks for flagging this, ${RENTER.first}. 💛 We'll take care of it from here and let you know the moment it's sorted.`;
-  if(s.offMarket) c += ` To be safe, we've paused the car while it's looked at.`;
+    ? `Got it, ${RENTER.first} — thanks, the photos help. 💛 We're on it, and we'll message you the second it's sorted.`
+    : `Got it, ${RENTER.first} — thanks for flagging this. 💛 We're on it, and we'll message you the second it's sorted.`;
+  if(s.offMarket) c += ` We've paused the car to be safe meanwhile.`;
   return c;
 }
 function resolveText(){ const s=sev(), t=state.report.tier, slow=state.report.latency==="slow", st=state.report.status;
-  if(st==="noaction") return `We looked into your report, ${RENTER.first} — turns out no fix was needed this time, but thank you. Reports like yours are exactly what keeps our cars in great shape. 💛`;
-  if(st==="escalated") return `Quick honest update, ${RENTER.first} — we want this fully sorted, so our team has stepped in to see it through. We'll keep you posted, and we won't let it slip. Thanks for your patience. 💛`;
-  // resolved
-  const lead = slow ? `Sorry this took a little longer than we'd like — but it's done. ` : ``;
-  const recog = t==="trusted" ? `you're one of our most trusted reporters` : t==="repeat" ? `thanks for helping keep our cars great` : `you rock`;
-  return `${lead}Good news, ${RENTER.first} — it's sorted! ✨ We ${s.consequence}. Thanks again for taking the time to flag it — ${recog}! 🙌`;
+  if(st==="noaction") return `Checked it out, ${RENTER.first} — all good, no fix needed this time. Thanks for looking out. 💛`;
+  if(st==="escalated") return `Our team's taken this on directly, ${RENTER.first} — to make sure it's done right. We'll keep you posted. 💛`;
+  const recog = t==="trusted" ? `you're one of our top reporters` : t==="repeat" ? `thanks for looking out` : `you rock`;
+  const open = slow ? `Sorted at last, ${RENTER.first} — sorry it took a bit!` : `Sorted, ${RENTER.first}!`;
+  return `${open} ✨ ${s.consequence}. Thanks for flagging it — ${recog}! 🙌`;
 }
 function latestPreview(){ return state.report.status==="open" ? stripTags(ackText()) : stripTags(resolveText()); }
 function stripTags(s){ return s.replace(/<[^>]+>/g,""); }
@@ -392,10 +391,10 @@ function viewInbox(){
       <div class="gaav host">T</div>
       <div class="mt"><div class="top"><span class="t">Thomas · ${CAR.name}</span><span class="tm">1h</span></div>
         <div class="pv">Thanks for renting the Clio! Hope it was a smooth trip — safe travels 🚗</div></div></div>`;
-  const pastConvo=`<div class="mcard" data-action="push-demo" data-pt="Getaround" data-pb="It's sorted! The owner gave the back seat a clean — thanks again for the heads-up. 🙌">
+  const pastConvo=`<div class="mcard" data-action="push-demo" data-pt="Getaround" data-pb="Sorted! The back seat's had a clean — thanks for the heads-up. 🙌">
       <div class="gaav resolved">${icon("check")}</div>
       <div class="mt"><div class="top"><span class="t">Getaround</span><span class="tm">3w</span></div>
-        <div class="pv">It's sorted! The owner gave the back seat a clean — thanks again for the heads-up. 🙌</div></div></div>`;
+        <div class="pv">Sorted! The back seat's had a clean — thanks for the heads-up. 🙌</div></div></div>`;
   return `
   <div class="topbar"><span class="title">Inbox</span><div class="avatar-btn" data-action="tab" data-screen="account">${RENTER.initial}</div></div>
   <div class="pad">
@@ -453,7 +452,7 @@ function viewThread(){
       <div class="gawrap"><div class="bubble ${isResolved?'resolved':''}">${resolveText()}${recog}</div>
         <div class="gatime">Getaround · just now</div></div></div>`;
   }
-  const ft = !open && r.status==="resolved" ? `<div class="ftnote">${icon("trend")}<span>Issues on cars like this get sorted fast — that's why renters keep coming back.</span></div>` : "";
+  const ft = !open && r.status==="resolved" ? `<div class="ftnote">${icon("trend")}<span>94% of reports here are sorted within a week.</span></div>` : "";
   const cta = open
     ? `<div class="threadcta actions"><button class="btn btn-soft" data-action="push-demo" data-pt="We'll message you" data-pb="No need to check back — we'll let you know the moment it's sorted.">${icon("check")} Got it, thanks</button></div>`
     : `<div class="threadcta actions"><button class="btn btn-soft" data-action="push-demo" data-pt="Reopened" data-pb="You can reopen any time if it's not quite right — we're still here.">${icon("reopen")} Not quite right? Reopen</button></div>`;
@@ -528,7 +527,7 @@ function startReport(){ setState({screen:"flow"},{screenChange:true}); }
 function submitReport(){
   setReport({status:"open"});
   setState({screen:"thread"},{screenChange:true});
-  setTimeout(()=>pushAlert("Getaround", stripTags(ackText()), false), 360);
+  setTimeout(()=>pushAlert("Got it 💛", stripTags(ackText()), false), 360);
 }
 function sendReply(){
   setReport({status:state.outcome});
@@ -536,12 +535,12 @@ function sendReply(){
   render({});
   const resolved=state.report.status==="resolved";
   if(resolved) fireConfetti();
-  const title = resolved?"Your report is sorted 🙌" : state.report.status==="escalated"?"We're making sure it's sorted" : "We looked into your report";
+  const title = resolved?"Sorted — thank you! 🙌" : state.report.status==="escalated"?"Our team's on it" : "All looked into 💛";
   setTimeout(()=>pushAlert(title, stripTags(resolveText()), resolved), 200);
   // scroll thread to bottom
   setTimeout(()=>{ const a=document.getElementById("app"); a.scrollTop=a.scrollHeight; }, 120);
 }
-function replay(){ setReport({status:"open"}); setState({screen:"thread"},{screenChange:true}); setTimeout(()=>pushAlert("Getaround", stripTags(ackText()), false), 360); }
+function replay(){ setReport({status:"open"}); setState({screen:"thread"},{screenChange:true}); setTimeout(()=>pushAlert("Got it 💛", stripTags(ackText()), false), 360); }
 
 /* ===================== RENDER ===================== */
 const TABS=[{s:"search",ic:"search",l:"Search"},{s:"trips",ic:"car",l:"Trips"},{s:"inbox",ic:"chat",l:"Inbox"},{s:"account",ic:"person",l:"Account"}];
