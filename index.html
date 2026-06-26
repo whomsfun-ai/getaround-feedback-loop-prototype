@@ -9,21 +9,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
 /* ============================================================
-   GETAROUND — Report Feedback Loop (positive close-the-loop)
+   GETAROUND — Report Feedback Loop (warm messaging, not a tracker)
    Single-file prototype · mock data · no backend.
    ============================================================ */
 :root{
   --brand:#7A1AA0; --brand-700:#63157F; --brand-tint:#F4E9F8;
   --ink:#231B47; --ink-2:#524C68; --ink-3:#7B7690;
-
-  /* loop states */
-  --received:#11B2C6;  --received-700:#0C8B9C; --received-tint:#E2F6F8;
-  --notified:#3D6CF5;  --notified-700:#2B4FBE; --notified-tint:#E7EDFE;
-  --onit:#E08A1E;      --onit-700:#9A5E0F;     --onit-tint:#FAEEDA;
-  --resolved:#18A06B;  --resolved-700:#0E7350; --resolved-tint:#E4F4ED;
-  --noaction:#7E8794;  --noaction-700:#5C636E; --noaction-tint:#EEEFF3;
-  --escalated:#5B6CF0; --escalated-700:#3F4DC2;--escalated-tint:#E8EAFE;
-
+  --teal:#11B2C6; --teal-700:#0C8B9C; --teal-tint:#E2F6F8;
+  --resolved:#18A06B; --resolved-700:#0E7350; --resolved-tint:#E4F4ED;
+  --amber:#E08A1E; --amber-700:#96600F; --amber-tint:#FAEEDA;
+  --slate:#7E8794; --slate-700:#5C636E; --slate-tint:#EEEFF3;
   --bg:#F4F4F7; --card:#FFFFFF; --line:#ECEAF2; --line-2:#F3F2F7;
   --shadow:0 1px 2px rgba(35,27,71,.04), 0 8px 24px -16px rgba(35,27,71,.22);
   --shadow-pop:0 22px 60px -22px rgba(35,27,71,.5);
@@ -59,39 +54,17 @@ body{font-family:var(--sans);color:var(--ink);background:#E9E7EE;
 .iconbtn{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;cursor:pointer;color:var(--ink);flex:none;transition:background .2s,transform .15s;}
 .iconbtn:hover{background:#fff;}.iconbtn:active{transform:scale(.92);}.iconbtn svg{width:20px;height:20px;}
 .topbar .title{font-weight:800;font-size:18px;letter-spacing:-.3px;}
-.detail-title{position:absolute;left:0;right:0;text-align:center;font-weight:800;font-size:16px;pointer-events:none;}
+/* thread header (feels like messaging Getaround) */
+.threadhead{position:absolute;left:54px;right:54px;display:flex;align-items:center;justify-content:center;gap:9px;pointer-events:none;}
+.threadhead .gaav{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7A1AA0,#B43A9E);display:grid;place-items:center;color:#fff;flex:none;}
+.threadhead .gaav svg{width:17px;height:17px;}
+.threadhead .tt b{font-weight:800;font-size:15px;display:block;line-height:1.1;}
+.threadhead .tt span{font-size:11px;color:var(--ink-3);font-weight:700;display:flex;align-items:center;gap:5px;}
+.threadhead .tt span .live{width:6px;height:6px;border-radius:50%;background:var(--resolved);}
 
 .sec{display:flex;align-items:center;justify-content:space-between;margin:20px 2px 11px;}
 .sec h2{font-size:16px;font-weight:800;letter-spacing:-.2px;}
 .sec .count{font-size:12.5px;color:var(--ink-3);font-weight:700;}
-
-/* chips */
-.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;padding:5px 11px;border-radius:99px;white-space:nowrap;}
-.chip .d{width:7px;height:7px;border-radius:50%;}
-.st-received{background:var(--received-tint);color:var(--received-700);} .st-received .d{background:var(--received);}
-.st-notified{background:var(--notified-tint);color:var(--notified-700);} .st-notified .d{background:var(--notified);}
-.st-onit{background:var(--onit-tint);color:var(--onit-700);} .st-onit .d{background:var(--onit);}
-.st-resolved{background:var(--resolved-tint);color:var(--resolved-700);} .st-resolved .d{background:var(--resolved);}
-.st-reviewed_no_action{background:var(--noaction-tint);color:var(--noaction-700);} .st-reviewed_no_action .d{background:var(--noaction);}
-.st-escalated{background:var(--escalated-tint);color:var(--escalated-700);} .st-escalated .d{background:var(--escalated);}
-
-/* report list card */
-.rcard{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:14px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow);transition:transform .2s;animation:rise .5s cubic-bezier(.2,.8,.2,1) both;}
-.rcard:active{transform:scale(.99);}
-.rcard.chg{animation:pulseRing 1.4s ease;}
-.rcard .ri{width:44px;height:44px;border-radius:12px;flex:none;display:grid;place-items:center;}
-.rcard .ri svg{width:23px;height:23px;}
-.rcard .rt{flex:1;min-width:0;}
-.rcard .rt .t{font-weight:800;font-size:15px;letter-spacing:-.2px;}
-.rcard .rt .s{font-size:12.5px;color:var(--ink-3);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:6px;}
-.rcard .rr{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex:none;}
-.rcard .rr .tm{font-size:11px;color:var(--ink-3);font-weight:700;}
-
-/* category icon backgrounds */
-.cat-cleanliness{background:var(--received-tint);color:var(--received-700);}
-.cat-safety{background:#FBE2E3;color:#A52A2F;}
-.cat-equipment{background:var(--brand-tint);color:var(--brand);}
-.cat-billing{background:var(--onit-tint);color:var(--onit-700);}
 
 /* report-an-issue CTA */
 .reportcta{display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,#7A1AA0,#9B2BAE);color:#fff;border:none;width:100%;border-radius:var(--r-lg);padding:16px;cursor:pointer;font-family:var(--sans);box-shadow:0 14px 30px -16px rgba(122,26,160,.7);transition:transform .15s;text-align:left;margin-top:14px;}
@@ -102,70 +75,27 @@ body{font-family:var(--sans);color:var(--ink);background:#E9E7EE;
 .reportcta .ct span{font-size:12.5px;opacity:.85;font-weight:600;}
 .reportcta .arr{margin-left:auto;}.reportcta .arr svg{width:20px;height:20px;}
 
-/* trip context strip */
 .trip{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:13px 15px;box-shadow:var(--shadow);margin-top:14px;}
 .trip .cav{width:46px;height:46px;border-radius:12px;background:linear-gradient(150deg,#EFEAF5,#E7EEF2);display:grid;place-items:center;color:var(--ink);flex:none;border:1px solid var(--line);}
 .trip .cav svg{width:26px;height:26px;}
 .trip .nm{font-weight:800;font-size:15px;}
 .trip .sub{font-size:12.5px;color:var(--ink-3);font-weight:600;margin-top:2px;}
 
-/* report detail */
-.summary{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;box-shadow:var(--shadow);margin-top:14px;}
-.summary .stop{display:flex;align-items:center;gap:13px;}
-.summary .ri{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;flex:none;}
-.summary .ri svg{width:25px;height:25px;}
-.summary .t{font-weight:800;font-size:17px;letter-spacing:-.3px;}
-.summary .s{font-size:12.5px;color:var(--ink-3);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.sysnote{display:flex;align-items:flex-start;gap:9px;margin-top:13px;padding:11px 12px;border-radius:var(--r-sm);font-size:12.5px;font-weight:600;line-height:1.45;}
-.sysnote svg{width:16px;height:16px;flex:none;margin-top:1px;}
+/* ===== inbox message cards ===== */
+.mcard{display:flex;align-items:flex-start;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:14px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow);transition:transform .2s;animation:rise .5s cubic-bezier(.2,.8,.2,1) both;}
+.mcard:active{transform:scale(.99);}
+.mcard.chg{animation:pulseRing 1.4s ease;}
+.mcard .gaav{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#7A1AA0,#B43A9E);display:grid;place-items:center;color:#fff;flex:none;}
+.mcard .gaav svg{width:23px;height:23px;}
+.mcard .gaav.resolved{background:linear-gradient(135deg,#18A06B,#15B07A);}
+.mcard .mt{flex:1;min-width:0;}
+.mcard .mt .top{display:flex;align-items:center;gap:8px;}
+.mcard .mt .t{font-weight:800;font-size:14.5px;letter-spacing:-.2px;}
+.mcard .mt .tm{margin-left:auto;font-size:11px;color:var(--ink-3);font-weight:700;flex:none;}
+.mcard .mt .pv{font-size:13px;color:var(--ink-2);font-weight:500;line-height:1.4;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.mcard.unread .mt .t::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--brand);margin-left:7px;vertical-align:1px;}
 
-/* timeline (the loop) */
-.tl{margin-top:16px;padding:2px 2px;}
-.tlnode{display:flex;gap:14px;position:relative;padding-bottom:6px;}
-.tldot{width:34px;flex:none;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;}
-.tldot .dotc{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none;border:2.5px solid var(--line);background:#fff;color:var(--ink-3);transition:all .3s;}
-.tldot .dotc svg{width:18px;height:18px;}
-.tlnode:not(:last-child) .tldot::after{content:"";position:absolute;top:34px;bottom:-6px;width:2.5px;background:var(--line);border-radius:2px;}
-.tlbody{flex:1;min-width:0;padding-bottom:18px;}
-.tlhead{display:flex;align-items:center;gap:8px;}
-.tlhead .nm{font-weight:800;font-size:15px;letter-spacing:-.2px;}
-.tlhead .tm{margin-left:auto;font-size:11px;color:var(--ink-3);font-weight:700;}
-.tlcopy{font-size:13.5px;color:var(--ink-2);font-weight:500;line-height:1.5;margin-top:6px;}
-.tlcopy b{font-weight:800;color:var(--ink);}
-.tlnode.pending .tldot .dotc{opacity:.55;}
-.tlnode.pending .tlhead .nm{color:var(--ink-3);}
-.tlnode.pending .tlcopy{display:none;}
-/* per-state done/current colours */
-.tlnode.on-received .dotc{border-color:var(--received);color:#fff;background:var(--received);} .tlnode.on-received::after,.tlnode.on-received .tldot::after{background:var(--received);}
-.tlnode.on-notified .dotc{border-color:var(--notified);color:#fff;background:var(--notified);}
-.tlnode.on-onit .dotc{border-color:var(--onit);color:#fff;background:var(--onit);}
-.tlnode.on-resolved .dotc{border-color:var(--resolved);color:#fff;background:var(--resolved);}
-.tlnode.on-reviewed_no_action .dotc{border-color:var(--noaction);color:#fff;background:var(--noaction);}
-.tlnode.on-escalated .dotc{border-color:var(--escalated);color:#fff;background:var(--escalated);}
-.tlnode.done .tldot::after{filter:none;}
-.tlnode.done.seg-received .tldot::after{background:var(--received);}
-.tlnode.done.seg-notified .tldot::after{background:var(--notified);}
-.tlnode.done.seg-onit .tldot::after{background:var(--onit);}
-.tlnode.current .dotc{animation:dotPulse 1.8s infinite;}
-@keyframes dotPulse{0%{box-shadow:0 0 0 0 rgba(122,26,160,.001);}0%{box-shadow:0 0 0 0 currentColor;}70%{box-shadow:0 0 0 8px transparent;}100%{box-shadow:0 0 0 0 transparent;}}
-.tldot .dotc.pulse-received{box-shadow:0 0 0 0 var(--received);}
-
-/* forward trust */
-.ftrust{display:flex;align-items:center;gap:11px;background:var(--resolved-tint);border:1px solid rgba(24,160,107,.22);border-radius:var(--r-md);padding:13px 14px;margin-top:14px;}
-.ftrust .fi{width:36px;height:36px;border-radius:10px;background:var(--resolved);color:#fff;display:grid;place-items:center;flex:none;}
-.ftrust .fi svg{width:19px;height:19px;}
-.ftrust .ft b{display:block;font-weight:800;font-size:13.5px;color:var(--resolved-700);}
-.ftrust .ft span{font-size:12px;color:#3d7a62;font-weight:600;}
-
-.actions{display:flex;flex-direction:column;gap:9px;margin-top:16px;}
-.btn{display:flex;align-items:center;justify-content:center;gap:9px;font-family:var(--sans);font-size:14.5px;font-weight:800;padding:15px;border-radius:13px;border:none;cursor:pointer;width:100%;transition:transform .16s,filter .2s,background .2s;letter-spacing:-.1px;}
-.btn svg{width:18px;height:18px;}.btn:active{transform:scale(.98);}
-.btn-primary{background:var(--brand);color:#fff;}.btn-primary:hover{background:var(--brand-700);}
-.btn-resolved{background:var(--resolved);color:#fff;}
-.btn-soft{background:var(--card);color:var(--ink);border:1px solid var(--line);}.btn-soft:hover{background:#fff;}
-.btn-row{display:flex;gap:9px;}.btn-row .btn{flex:1;}
-
-/* report flow */
+/* ===== report flow ===== */
 .flowq{font-size:20px;font-weight:800;letter-spacing:-.4px;margin:16px 2px 4px;}
 .flowsub{font-size:13.5px;color:var(--ink-2);font-weight:500;margin:0 2px 14px;line-height:1.5;}
 .catgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
@@ -176,6 +106,10 @@ body{font-family:var(--sans);color:var(--ink);background:#E9E7EE;
 .catopt .ci svg{width:22px;height:22px;}
 .catopt .cl{font-weight:800;font-size:14px;}
 .catopt .cd{font-size:11.5px;color:var(--ink-3);font-weight:600;line-height:1.35;}
+.cat-cleanliness{background:var(--teal-tint);color:var(--teal-700);}
+.cat-safety{background:#FBE2E3;color:#A52A2F;}
+.cat-equipment{background:var(--brand-tint);color:var(--brand);}
+.cat-billing{background:var(--amber-tint);color:var(--amber-700);}
 .field{margin-top:16px;}
 .field .lab{font-size:13px;font-weight:800;margin-bottom:9px;}
 .ta{width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:13px;font-family:var(--sans);font-size:14px;color:var(--ink);resize:none;min-height:88px;line-height:1.5;}
@@ -186,34 +120,67 @@ body{font-family:var(--sans);color:var(--ink);background:#E9E7EE;
 .addphoto{width:60px;height:60px;border-radius:12px;border:1.5px dashed var(--line);background:var(--card);display:grid;place-items:center;color:var(--ink-3);cursor:pointer;flex:none;}
 .addphoto svg{width:22px;height:22px;}
 
-/* notifications */
-.nrow{display:flex;align-items:flex-start;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:13px;margin-bottom:9px;box-shadow:var(--shadow);cursor:pointer;animation:rise .45s cubic-bezier(.2,.8,.2,1) both;}
-.nrow.unread{border-color:rgba(122,26,160,.25);}
-.nrow .ni{width:40px;height:40px;border-radius:11px;flex:none;display:grid;place-items:center;}
-.nrow .ni svg{width:21px;height:21px;}
-.nrow .nt{flex:1;min-width:0;}
-.nrow .nt .t{font-weight:800;font-size:14px;letter-spacing:-.2px;}
-.nrow .nt .b{font-size:12.5px;color:var(--ink-2);font-weight:500;line-height:1.45;margin-top:3px;}
-.nrow .nt .tm{font-size:11px;color:var(--ink-3);font-weight:700;margin-top:5px;}
-.nrow.signature{background:linear-gradient(180deg,var(--resolved-tint),#fff 70%);border-color:rgba(24,160,107,.25);}
-.empty{text-align:center;padding:34px 22px;}
-.empty .eic{width:58px;height:58px;border-radius:16px;background:var(--brand-tint);color:var(--brand);display:grid;place-items:center;margin:0 auto 14px;}
-.empty .eic svg{width:30px;height:30px;}
-.empty h3{font-size:17px;font-weight:800;}
-.empty p{font-size:13px;color:var(--ink-2);margin-top:6px;line-height:1.5;font-weight:500;max-width:26ch;margin-inline:auto;}
+.actions{display:flex;flex-direction:column;gap:9px;margin-top:16px;}
+.btn{display:flex;align-items:center;justify-content:center;gap:9px;font-family:var(--sans);font-size:14.5px;font-weight:800;padding:15px;border-radius:13px;border:none;cursor:pointer;width:100%;transition:transform .16s,filter .2s,background .2s;letter-spacing:-.1px;}
+.btn svg{width:18px;height:18px;}.btn:active{transform:scale(.98);}
+.btn-primary{background:var(--brand);color:#fff;}.btn-primary:hover{background:var(--brand-700);}
+.btn-soft{background:var(--card);color:var(--ink);border:1px solid var(--line);}.btn-soft:hover{background:#fff;}
 
-/* account */
+/* ===== message thread ===== */
+.threadwrap{padding:8px 16px 22px;}
+.daysep{text-align:center;font-size:11px;font-weight:800;color:var(--ink-3);letter-spacing:.4px;text-transform:uppercase;margin:14px 0 10px;}
+/* the report you filed (context card) */
+.myreport{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:14px;box-shadow:var(--shadow);}
+.myreport .top{display:flex;align-items:center;gap:12px;}
+.myreport .ri{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;flex:none;}
+.myreport .ri svg{width:22px;height:22px;}
+.myreport .t{font-weight:800;font-size:15px;letter-spacing:-.2px;}
+.myreport .meta{font-size:11.5px;color:var(--ink-3);font-weight:700;margin-top:2px;}
+.myreport .desc{font-size:13px;color:var(--ink-2);font-weight:500;line-height:1.5;margin-top:11px;}
+.myreport .thumbs{display:flex;gap:7px;margin-top:11px;}
+.myreport .thumbs .photo{width:48px;height:48px;border-radius:10px;}
+/* soft state pill */
+.statepill{display:flex;justify-content:center;margin:16px 0 4px;}
+.statepill span{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;padding:7px 14px;border-radius:99px;}
+.sp-open{background:var(--brand-tint);color:var(--brand);}
+.sp-resolved{background:var(--resolved-tint);color:var(--resolved-700);}
+.sp-noaction{background:var(--slate-tint);color:var(--slate-700);}
+.sp-escalated{background:var(--amber-tint);color:var(--amber-700);}
+/* getaround warm message bubble */
+.gamsg{display:flex;gap:10px;align-items:flex-end;margin-top:16px;animation:msgIn .45s cubic-bezier(.2,.85,.2,1) both;}
+.gamsg .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7A1AA0,#B43A9E);display:grid;place-items:center;color:#fff;flex:none;margin-bottom:18px;}
+.gamsg .av svg{width:18px;height:18px;}
+.gamsg.resolved .av{background:linear-gradient(135deg,#18A06B,#15B07A);}
+.gawrap{flex:1;min-width:0;}
+.bubble{background:#fff;border:1px solid var(--line);border-radius:5px 18px 18px 18px;padding:13px 15px;box-shadow:var(--shadow);font-size:14px;color:var(--ink);font-weight:500;line-height:1.55;max-width:90%;}
+.bubble b{font-weight:800;}
+.bubble.resolved{background:var(--resolved-tint);border-color:rgba(24,160,107,.25);}
+.bubble .reward{display:inline-flex;align-items:center;gap:7px;margin-top:12px;background:#fff;border:1px solid rgba(24,160,107,.3);color:var(--resolved-700);font-weight:800;font-size:12.5px;padding:7px 12px;border-radius:99px;}
+.bubble .reward svg{width:15px;height:15px;}
+.bubble .recog{display:block;margin-top:11px;font-size:12.5px;font-weight:800;color:var(--brand);}
+.gatime{font-size:11px;color:var(--ink-3);font-weight:700;margin-top:6px;margin-left:3px;}
+/* forward trust (a soft closing note, not a bubble) */
+.ftnote{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:22px;font-size:12px;color:var(--ink-3);font-weight:600;text-align:center;line-height:1.4;}
+.ftnote svg{width:15px;height:15px;color:var(--resolved);flex:none;}
+.threadcta{margin-top:20px;}
+
+/* ===== account ===== */
 .acard{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden;margin-top:14px;}
 .aprofile{display:flex;align-items:center;gap:13px;padding:18px 16px;}
 .aprofile .av{width:54px;height:54px;border-radius:15px;background:linear-gradient(135deg,#7A1AA0,#B43A9E);display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px;flex:none;}
 .aprofile .nm{font-weight:800;font-size:18px;letter-spacing:-.3px;}
 .aprofile .ro{font-size:13px;color:var(--ink-3);font-weight:600;margin-top:2px;display:flex;align-items:center;gap:6px;}
-.trusted{font-size:11px;font-weight:800;color:var(--onit-700);background:var(--onit-tint);padding:3px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:5px;}
+.trusted{font-size:11px;font-weight:800;color:var(--amber-700);background:var(--amber-tint);padding:3px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:5px;}
 .trusted svg{width:13px;height:13px;}
 .astat{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line-2);}
 .astat .b{padding:14px 16px;}.astat .b:first-child{border-right:1px solid var(--line-2);}
 .astat .v{font-weight:800;font-size:17px;}
 .astat .l{font-size:11.5px;color:var(--ink-3);font-weight:700;margin-top:2px;}
+.empty{text-align:center;padding:30px 22px;}
+.empty .eic{width:58px;height:58px;border-radius:16px;background:var(--brand-tint);color:var(--brand);display:grid;place-items:center;margin:0 auto 14px;}
+.empty .eic svg{width:30px;height:30px;}
+.empty h3{font-size:17px;font-weight:800;}
+.empty p{font-size:13px;color:var(--ink-2);margin-top:6px;line-height:1.5;font-weight:500;max-width:26ch;margin-inline:auto;}
 
 /* bottom nav */
 .tabbar{flex:none;height:62px;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:2px;z-index:35;}
@@ -223,32 +190,30 @@ body{font-family:var(--sans);color:var(--ink);background:#E9E7EE;
 .tab .dot{position:absolute;top:9px;right:50%;margin-right:-15px;width:8px;height:8px;border-radius:50%;background:var(--brand);border:1.5px solid #fff;}
 .screen.detail .tabbar,.screen.flow .tabbar{display:none;}
 
-/* ===== overlay (signature moments) ===== */
-.scrim{position:absolute;inset:0;background:rgba(20,16,30,.5);opacity:0;pointer-events:none;transition:opacity .3s;z-index:50;display:flex;align-items:center;justify-content:center;padding:22px;}
-.scrim.show{opacity:1;pointer-events:auto;}
-.modal{background:#fff;border-radius:24px;width:100%;max-width:320px;padding:26px 22px 22px;text-align:center;box-shadow:var(--shadow-pop);transform:translateY(20px) scale(.96);transition:transform .42s cubic-bezier(.2,.85,.2,1);position:relative;overflow:hidden;}
-.scrim.show .modal{transform:none;}
-.modal .emoji{font-size:46px;line-height:1;margin-bottom:6px;animation:pop .5s cubic-bezier(.2,1.4,.4,1) both;}
-.modal h2{font-size:23px;font-weight:800;letter-spacing:-.5px;margin-top:6px;}
-.modal .mc{font-size:14px;color:var(--ink-2);font-weight:500;line-height:1.55;margin-top:10px;}
-.modal .mc b{font-weight:800;color:var(--ink);}
-.modal .credit{display:inline-flex;align-items:center;gap:8px;margin-top:15px;background:var(--resolved-tint);color:var(--resolved-700);font-weight:800;font-size:14px;padding:9px 14px;border-radius:99px;}
-.modal .credit svg{width:17px;height:17px;}
-.modal .recog{margin-top:14px;font-size:12.5px;font-weight:700;color:var(--brand);background:var(--brand-tint);padding:8px 13px;border-radius:99px;display:inline-block;}
-.modal .mact{margin-top:18px;}
-.confetti{position:absolute;top:0;left:0;right:0;height:100%;pointer-events:none;overflow:hidden;}
-.confetti i{position:absolute;top:-12px;width:8px;height:13px;border-radius:2px;opacity:.9;animation:fall 1.6s linear forwards;}
-@keyframes fall{to{transform:translateY(420px) rotate(360deg);opacity:0;}}
-@keyframes pop{from{transform:scale(0);}to{transform:scale(1);}}
+/* ===== push alert (the "messaging alert system") ===== */
+.push{position:absolute;left:12px;right:12px;top:50px;z-index:70;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.4) blur(8px);border:1px solid var(--line);border-radius:18px;padding:11px 13px;display:flex;align-items:center;gap:11px;box-shadow:0 18px 40px -14px rgba(35,27,71,.4);transform:translateY(-160%);opacity:0;transition:transform .5s cubic-bezier(.2,.9,.2,1),opacity .3s;cursor:pointer;}
+.push.show{transform:translateY(0);opacity:1;}
+.push .pa{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#7A1AA0,#B43A9E);display:grid;place-items:center;color:#fff;flex:none;}
+.push .pa svg{width:20px;height:20px;}
+.push.resolved .pa{background:linear-gradient(135deg,#18A06B,#15B07A);}
+.push .pt{flex:1;min-width:0;}
+.push .pt .h{display:flex;align-items:center;gap:7px;}
+.push .pt .h b{font-weight:800;font-size:13px;}
+.push .pt .h .tm{margin-left:auto;font-size:11px;color:var(--ink-3);font-weight:700;}
+.push .pt .b{font-size:12.5px;color:var(--ink-2);font-weight:600;line-height:1.35;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:65;}
+.confetti i{position:absolute;top:-14px;width:8px;height:13px;border-radius:2px;opacity:.9;animation:fall 1.7s linear forwards;}
+@keyframes fall{to{transform:translateY(520px) rotate(380deg);opacity:0;}}
 
-/* toast */
-.toast{position:absolute;left:16px;right:16px;top:54px;z-index:70;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:11px;box-shadow:0 16px 36px -14px rgba(35,27,71,.35);transform:translateY(-150%);opacity:0;transition:transform .42s cubic-bezier(.2,.85,.2,1),opacity .3s;}
-.toast.show{transform:translateY(0);opacity:1;}
-.toast .ti{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;}
-.toast .ti svg{width:18px;height:18px;}
-.toast .tt{flex:1;min-width:0;}
-.toast .tt .t{font-weight:800;font-size:13.5px;}
-.toast .tt .b{font-size:12px;color:var(--ink-2);font-weight:500;line-height:1.4;margin-top:1px;}
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+@keyframes msgIn{from{opacity:0;transform:translateY(16px) scale(.98);}to{opacity:1;transform:none;}}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+@keyframes pulseRing{0%{box-shadow:var(--shadow);}18%{box-shadow:0 0 0 3px rgba(122,26,160,.22),var(--shadow);}100%{box-shadow:var(--shadow);}}
+.screen-enter{animation:screenIn .4s cubic-bezier(.2,.8,.2,1) both;}
+@keyframes screenIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.stagger>*{animation:rise .5s cubic-bezier(.2,.8,.2,1) both;}
+.stagger>*:nth-child(2){animation-delay:.05s}.stagger>*:nth-child(3){animation-delay:.1s}.stagger>*:nth-child(4){animation-delay:.15s}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
 
 /* ===== console ===== */
 .console{align-self:center;max-width:430px;animation:rise .9s .1s cubic-bezier(.2,.8,.2,1) both;}
@@ -262,34 +227,17 @@ body{font-family:var(--sans);color:var(--ink);background:#E9E7EE;
 .panel .ph svg{width:16px;height:16px;color:var(--brand);}
 .clabel{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--ink-3);margin:16px 0 9px;}
 .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.crow3{display:flex;gap:7px;}.crow3 .cbtn{flex:1;}
 .cbtn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--sans);font-weight:700;font-size:12.5px;padding:9px 8px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink-2);cursor:pointer;transition:border-color .2s,background .2s,transform .15s;}
 .cbtn svg{width:15px;height:15px;}
 .cbtn:active{transform:scale(.98);}
 .cbtn.on{border-color:var(--brand);background:var(--brand-tint);color:var(--brand);}
-.crow3{display:flex;gap:7px;}
-.crow3 .cbtn{flex:1;}
-.advance{display:flex;align-items:center;gap:12px;margin-top:14px;}
-.advance .state{flex:1;min-width:0;}
-.advance .state .lab{font-size:11px;color:var(--ink-3);font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
-.advance .state .v{font-weight:800;font-size:15px;margin-top:2px;display:inline-flex;align-items:center;gap:7px;}
-.advance .state .v .d{width:9px;height:9px;border-radius:50%;}
-.nextbtn{background:var(--brand);color:#fff;border:none;font-family:var(--sans);font-weight:800;font-size:14px;padding:12px 18px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .2s,transform .15s;flex:none;}
-.nextbtn:hover{background:var(--brand-700);}.nextbtn:active{transform:scale(.97);}
-.nextbtn:disabled{opacity:.4;cursor:default;}
-.nextbtn svg{width:16px;height:16px;}
-.cmini{display:flex;gap:7px;margin-top:12px;}
-.cmini .cbtn{flex:1;}
+.sendbtn{width:100%;margin-top:14px;background:var(--resolved);color:#fff;border:none;font-family:var(--sans);font-weight:800;font-size:14.5px;padding:14px;border-radius:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:filter .2s,transform .15s;}
+.sendbtn:hover{filter:brightness(.96);}.sendbtn:active{transform:scale(.98);}
+.sendbtn svg{width:18px;height:18px;}
+.cmini{display:flex;gap:7px;margin-top:9px;}.cmini .cbtn{flex:1;}
 .fnote{font-size:11.5px;color:var(--ink-3);margin-top:18px;display:flex;gap:8px;line-height:1.5;font-weight:500;}
 .fnote svg{width:15px;height:15px;flex:none;}
-
-@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
-@keyframes pulseRing{0%{box-shadow:var(--shadow);}18%{box-shadow:0 0 0 3px rgba(122,26,160,.22),var(--shadow);}100%{box-shadow:var(--shadow);}}
-.screen-enter{animation:screenIn .4s cubic-bezier(.2,.8,.2,1) both;}
-@keyframes screenIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
-.stagger>*{animation:rise .5s cubic-bezier(.2,.8,.2,1) both;}
-.stagger>*:nth-child(2){animation-delay:.05s}.stagger>*:nth-child(3){animation-delay:.1s}.stagger>*:nth-child(4){animation-delay:.15s}.stagger>*:nth-child(5){animation-delay:.2s}
-@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
 </style>
 </head>
 <body>
@@ -306,90 +254,66 @@ body{font-family:var(--sans);color:var(--ink);background:#E9E7EE;
         </div>
         <div class="body" id="app"></div>
         <nav class="tabbar" id="tabbar"></nav>
-        <div class="scrim" id="scrim"><div class="modal" id="modal"></div></div>
-        <div class="toast" id="toast"></div>
+        <div class="confetti" id="confetti"></div>
+        <div class="push" id="push" data-action="open-thread"></div>
       </div>
     </div>
   </div>
 
   <aside class="console">
     <span class="tag"><span class="d"></span>Interactive prototype · mock data</span>
-    <h1>Close the loop.</h1>
-    <p class="lede">Today a renter's report vanishes into silence. This turns every report into a <b>warm, visible loop</b> — acknowledged when flagged, celebrated when resolved. Pick a report type, choose how it ends, then <b>advance the loop</b> and watch the renter's tracker and notifications update.</p>
+    <h1>You're heard.</h1>
+    <p class="lede">Not a status tracker — a warm <b>two-beat message</b>. Report something and Getaround tells you it's handled; when it's sorted, a <b>thank-you arrives</b>. No granular states, no watching the wait. Send the reply below and watch the message land.</p>
     <div class="panel">
-      <div class="ph"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1115 5M4 12V7m0 5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Demo controls</div>
+      <div class="ph"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v11H8l-4 3V5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Demo controls</div>
       <div class="clabel">What was reported</div>
       <div class="cgrid" id="c-sev"></div>
-      <div class="clabel">How it ends</div>
-      <div class="crow3" id="c-branch"></div>
-      <div class="advance">
-        <div class="state"><div class="lab">Current state</div><div class="v" id="c-state"></div></div>
-        <button class="nextbtn" id="c-next" data-action="advance">Next step <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      </div>
-      <div class="cmini"><button class="cbtn" data-action="restart-loop">Reset loop</button><button class="cbtn" data-action="resubmit">Replay submit ✦</button></div>
+      <div class="clabel">Getaround's reply</div>
+      <div class="crow3" id="c-outcome"></div>
+      <button class="sendbtn" id="c-send" data-action="send-reply"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l16-7-7 16-2.5-6.5L4 12z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Send the reply</button>
+      <div class="cmini"><button class="cbtn" data-action="reset-open">Reset to “just reported”</button><button class="cbtn" data-action="replay">Replay report ✦</button></div>
       <div class="clabel">Reporter</div>
       <div class="crow3" id="c-tier"></div>
       <div class="clabel">Resolution speed</div>
       <div class="crow3" id="c-latency"></div>
     </div>
-    <div class="fnote"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Warm and appreciative throughout — never punitive, never promising compensation that isn't coming. Every report reaches a terminal state, even "no action needed," so the tracker is never left hanging.</div>
+    <div class="fnote"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Warm and appreciative, never punitive, never promising compensation that isn't coming. The renter never sees the owner machinery — just “we've got it” and “it's sorted, thank you.”</div>
   </aside>
 </div>
 
 <script>
 "use strict";
 /* ===================== DATA ===================== */
-const CAR={name:"Renault Clio", year:2022, plate:"FR-208-AB", trip:"Trip ended · today, 2:14 pm"};
-
+const RENTER={first:"Marie", initial:"M"};
+const CAR={name:"Renault Clio", trip:"Trip ended · today, 2:14 pm"};
 const SEVERITIES={
   cleanliness:{label:"Cleanliness", short:"Cleanliness", icon:"sparkle", catClass:"cat-cleanliness", desc:"Dirty, or a smell",
     exTitle:"Cigarette smell in the cabin", exText:"There was a strong stale-cigarette smell, especially in the front seats.",
-    sysNote:{text:"Flagged to the owner to re-clean — no charge to you.", state:"received"},
-    consequence:"re-cleaned the car and confirmed it's sorted", chargeable:false},
+    consequence:"gave the car a deep re-clean and confirmed it's fresh again", chargeable:false},
   safety:{label:"Safety", short:"Safety", icon:"alert", catClass:"cat-safety", desc:"Mechanical or unsafe",
     exTitle:"Warning light on the dash", exText:"An orange engine warning light came on during the trip.",
-    sysNote:{text:"We've taken the car off the market while this is checked.", state:"received"},
-    consequence:"confirmed the fix, and the car's been re-checked before going back out", chargeable:false, offMarket:true},
+    consequence:"had it checked over and confirmed it's all good to drive again", chargeable:false, offMarket:true},
   equipment:{label:"Equipment", short:"Equipment", icon:"clipboard", catClass:"cat-equipment", desc:"Missing / not as listed",
     exTitle:"No phone holder as listed", exText:"The listing mentioned a phone holder but there wasn't one in the car.",
-    sysNote:{text:"Noted on the listing for review.", state:"received"},
-    consequence:"corrected the listing so the next renter knows what to expect", chargeable:false},
+    consequence:"sorted the listing so the next renter knows exactly what to expect", chargeable:false},
   billing:{label:"Billing", short:"Billing", icon:"euro", catClass:"cat-billing", desc:"A charge looks wrong",
     exTitle:"Cleaning fee I shouldn't have", exText:"I returned the car clean but was charged a €35 cleaning fee.",
-    sysNote:{text:"We've put the disputed charge on hold while we review.", state:"received"},
-    consequence:"reviewed the charge and refunded the disputed amount", chargeable:true, credit:"€35"},
+    consequence:"reviewed the charge and put it right", chargeable:true, credit:"€35"},
 };
-const BRANCHES={
-  resolve:["received","notified","onit","resolved"],
-  noaction:["received","notified","reviewed_no_action"],
-  escalate:["received","notified","escalated"],
-};
-const STATE_META={
-  received:{label:"Received", icon:"check", color:"received"},
-  notified:{label:"Owner notified", icon:"bell", color:"notified"},
-  onit:{label:"Owner is on it", icon:"wrench", color:"onit"},
-  resolved:{label:"Resolved", icon:"hands", color:"resolved"},
-  reviewed_no_action:{label:"Reviewed — no action", icon:"eye", color:"noaction"},
-  escalated:{label:"Escalated — we're on it", icon:"shield", color:"escalated"},
-};
+const OUTCOMES={resolved:"Resolved", noaction:"No fix needed", escalated:"Our team steps in"};
 const TIERS={first:"First-time", repeat:"Repeat", trusted:"Trusted"};
 const TIER_HELPED={first:1, repeat:12, trusted:41};
+const STATE_PILL={
+  open:{cls:"sp-open", txt:"💛 We're on it"},
+  resolved:{cls:"sp-resolved", txt:"✨ Sorted"},
+  noaction:{cls:"sp-noaction", txt:"💛 Looked into it"},
+  escalated:{cls:"sp-escalated", txt:"🤝 Our team's on it"},
+};
 
 /* ===================== STATE ===================== */
-let state={
-  screen:"reports",
-  report:{category:"cleanliness", branch:"resolve", reached:0, tier:"first", latency:"fast", photos:true},
-  newCat:"cleanliness",
-  notifications:[],
-  toastTimer:null,
-};
+let state={ screen:"inbox", report:{category:"cleanliness", status:"open", tier:"first", latency:"fast", photos:true}, outcome:"resolved", pushTimer:null };
 function setState(p,opts){ state=Object.assign({},state,p); render(opts||{}); }
 function setReport(p){ state.report=Object.assign({},state.report,p); }
-
-/* derived */
-function steps(){ return BRANCHES[state.report.branch]; }
-function currentStateKey(){ return steps()[Math.min(state.report.reached, steps().length-1)]; }
-function isTerminalReached(){ return state.report.reached >= steps().length-1; }
 function sev(){ return SEVERITIES[state.report.category]; }
 
 /* ===================== ICONS ===================== */
@@ -398,260 +322,184 @@ function icon(n){const I={
   alert:`<path d="M12 4l9 16H3L12 4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>`,
   clipboard:`<rect x="5.5" y="5" width="13" height="15" rx="2.4" stroke="currentColor" stroke-width="1.6"/><path d="M9 5.5V4.5a1.5 1.5 0 011.5-1.5h3A1.5 1.5 0 0115 4.5v1M9 11h6M9 14.5h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
   euro:`<path d="M15.5 7.6A5 5 0 008 11h6M8 13h5.5M15.5 16.4A5 5 0 018 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`,
+  heart:`<path d="M12 20s-7-4.4-7-9.5A3.8 3.8 0 0112 8a3.8 3.8 0 017 2.5C19 15.6 12 20 12 20z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>`,
+  heartf:`<path d="M12 20s-7-4.4-7-9.5A3.8 3.8 0 0112 8a3.8 3.8 0 017 2.5C19 15.6 12 20 12 20z" fill="currentColor"/>`,
   check:`<path d="M5 12.5l4.5 4.5L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
-  bell:`<path d="M7 17V11a5 5 0 0110 0v6l1.5 2H5.5L7 17z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M10.2 19.5a2 2 0 003.6 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`,
-  wrench:`<path d="M14.7 6.3a3.7 3.7 0 00-4.9 4.6L4 16.7 7.3 20l5.8-5.8a3.7 3.7 0 004.6-4.9l-2.3 2.3-2.1-.6-.6-2.1 2-2.6z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>`,
-  hands:`<path d="M7 11V6.5a1.3 1.3 0 012.6 0V10m0-1V5a1.3 1.3 0 012.6 0v5m0-1V6a1.3 1.3 0 012.6 0v6.5c0 3-2 5.5-5.2 5.5-2.2 0-3.4-1-4.6-2.6L4.6 13a1.3 1.3 0 012-1.6L7 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`,
-  eye:`<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.6" stroke="currentColor" stroke-width="1.7"/>`,
-  shield:`<path d="M12 3.5l7 2.5v5c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6l7-2.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`,
   chevron:`<path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>`,
   back:`<path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`,
   arrow:`<path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`,
   car:`<path d="M5 13l1.4-4.2A2.5 2.5 0 018.8 7h6.4a2.5 2.5 0 012.4 1.8L19 13M4.5 13h15v3.4a1 1 0 01-1 1h-1.5a1 1 0 01-1-1V16h-7v.4a1 1 0 01-1 1H5.5a1 1 0 01-1-1V13z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="8" cy="15" r="1" fill="currentColor"/><circle cx="16" cy="15" r="1" fill="currentColor"/>`,
-  reports:`<rect x="5" y="3.5" width="14" height="17" rx="2.4" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
+  inbox:`<path d="M4 13l2.2-7A2 2 0 018.1 4.5h7.8A2 2 0 0117.8 6L20 13v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 13h4l1.2 2h5.6l1.2-2h4" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
   person:`<circle cx="12" cy="8.5" r="3.6" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 19.5a6.5 6.5 0 0113 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
   camera:`<path d="M4 8.5h3l1.3-1.8h7.4L17 8.5h3v9.5H4V8.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="13" r="3" stroke="currentColor" stroke-width="1.6"/>`,
   plus:`<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
-  reopen:`<path d="M4 12a8 8 0 108-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 4v4h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`,
   gift:`<rect x="4.5" y="9" width="15" height="11" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M4.5 13h15M12 9v11M8.5 9a2 2 0 010-4c2 0 3.5 4 3.5 4s1.5-4 3.5-4a2 2 0 010 4" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
-  heart:`<path d="M12 20s-7-4.4-7-9.5A3.8 3.8 0 0112 8a3.8 3.8 0 017 2.5C19 15.6 12 20 12 20z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
   star:`<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9L12 3.5z" fill="currentColor"/>`,
   trend:`<path d="M4 15l5-5 4 4 7-8M16 6h4v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`,
   info:`<circle cx="12" cy="12" r="8.6" stroke="currentColor" stroke-width="1.6"/><path d="M12 11v5M12 8.2h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>`,
-  off:`<circle cx="12" cy="12" r="8.4" stroke="currentColor" stroke-width="1.7"/><path d="M6.5 6.5l11 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`,
-  clock:`<circle cx="12" cy="12" r="8.4" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.6V12l3 1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`,
+  reopen:`<path d="M4 12a8 8 0 108-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 4v4h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`,
 };return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none">${I[n]||""}</svg>`;}
 
-/* ===================== COPY ENGINE  message = f(severity, state, outcome, tier, latency) ===================== */
-function ackCopy(){ const s=sev();
+/* ===================== COPY (warm, two beats) ===================== */
+function ackText(){ const s=sev();
   let c = state.report.photos
-    ? `Thanks for flagging this — and for the photos, they really help. We'll reach out to the owner directly to let them know.`
-    : `Thanks for flagging this — we'll reach out to the owner directly to let them know.`;
-  if(s.offMarket) c += ` We've taken the car off the market while it's checked.`;
-  return c + ` We'll keep you posted. 💛`;
+    ? `Thanks for flagging this, ${RENTER.first} — and for the photos, they really help. 💛 We'll take care of it and let you know the moment it's sorted.`
+    : `Thanks for flagging this, ${RENTER.first}. 💛 We'll take care of it from here and let you know the moment it's sorted.`;
+  if(s.offMarket) c += ` To be safe, we've paused the car while it's looked at.`;
+  return c;
 }
-function nodeCopy(key){
-  const s=sev(), t=state.report.tier, slow=state.report.latency==="slow";
-  if(key==="received") return ackCopy();
-  if(key==="notified") return `Quick update: we've let the owner know about the issue you reported.`;
-  if(key==="onit") return `Good news — the owner is taking care of it right now.`;
-  if(key==="resolved"){
-    let lead = slow ? `We know this one took longer than we'd like — but it's sorted. ` : ``;
-    let recog = t==="trusted" ? `you're one of our most trusted reporters` : t==="repeat" ? `thanks for helping keep the fleet in shape` : `you rock`;
-    let credit = s.chargeable ? ` We've also refunded the <b>${s.credit}</b> to your account.` : ``;
-    return `${lead}The owner ${s.consequence}. Thanks again for taking the time to flag it — ${recog}! 🙌${credit}`;
-  }
-  if(key==="reviewed_no_action") return `We looked into your report and didn't find a fix was needed here — but thank you, reports like yours keep the fleet in good shape.`;
-  if(key==="escalated") return `We couldn't confirm a fix from the owner, so we've flagged the listing and our team is following up directly. Thanks for your patience — and for flagging it.`;
-  return "";
+function resolveText(){ const s=sev(), t=state.report.tier, slow=state.report.latency==="slow", st=state.report.status;
+  if(st==="noaction") return `We looked into your report, ${RENTER.first} — turns out no fix was needed this time, but thank you. Reports like yours are exactly what keeps our cars in great shape. 💛`;
+  if(st==="escalated") return `Quick honest update, ${RENTER.first} — we want this fully sorted, so our team has stepped in to see it through. We'll keep you posted, and we won't let it slip. Thanks for your patience. 💛`;
+  // resolved
+  const lead = slow ? `Sorry this took a little longer than we'd like — but it's done. ` : ``;
+  const recog = t==="trusted" ? `you're one of our most trusted reporters` : t==="repeat" ? `thanks for helping keep our cars great` : `you rock`;
+  const credit = s.chargeable ? ` We've refunded the <b>${s.credit}</b> to your account.` : ``;
+  return `${lead}Good news, ${RENTER.first} — it's sorted! ✨ We ${s.consequence}. Thanks again for taking the time to flag it — ${recog}! 🙌${credit}`;
 }
-function nodeTime(idx){ const labels=["just now","1 min ago","moments ago","just now"]; return idx===0?"2 min ago":labels[idx]||"just now"; }
-
-/* notifications built from reached states */
-function rebuildNotifications(){
-  const list=[]; const st=steps();
-  for(let i=0;i<=Math.min(state.report.reached, st.length-1);i++){
-    const key=st[i], m=STATE_META[key], signature=(key==="received"||key==="resolved");
-    list.push({key, title: key==="resolved"?"Your report was resolved 🙌" : key==="received"?"We got your report 💛" : m.label,
-      body: stripTags(nodeCopy(key)), color:m.color, icon:m.icon, signature, time: i===0?"2 min ago":"just now"});
-  }
-  state.notifications = list.reverse();
-}
+function latestPreview(){ return state.report.status==="open" ? stripTags(ackText()) : stripTags(resolveText()); }
 function stripTags(s){ return s.replace(/<[^>]+>/g,""); }
 
 /* ===================== VIEWS ===================== */
-function statusChip(key){ const m=STATE_META[key]; return `<span class="chip st-${key}"><span class="d"></span>${m.label}</span>`; }
-function carGlyph(){ return `<div class="cav">${icon("car")}</div>`; }
-
-function viewReports(){
-  const r=state.report, cur=currentStateKey(), s=sev();
-  const active=`<div class="rcard chg" data-action="open-detail">
-      <div class="ri ${s.catClass}">${icon(s.icon)}</div>
-      <div class="rt"><div class="t">${s.exTitle}</div><div class="s">${CAR.name} · ${TIERS[r.tier]==='First-time'?'reported today':'reported today'}</div></div>
-      <div class="rr">${statusChip(cur)}<span class="tm">now</span></div></div>`;
-  const past=`<div class="rcard" data-action="toast" data-tt="Past report" data-tb="A resolved report from a previous trip — you helped 6 future renters.">
-      <div class="ri cat-cleanliness">${icon("sparkle")}</div>
-      <div class="rt"><div class="t">Crumbs on the back seat</div><div class="s">Peugeot 208 · 3 weeks ago</div></div>
-      <div class="rr">${statusChip("resolved")}<span class="tm">3w</span></div></div>`;
+function viewInbox(){
+  const r=state.report, s=sev();
+  const open=r.status==="open";
+  const active=`<div class="mcard chg unread" data-action="open-thread">
+      <div class="gaav ${open?'':'resolved'}">${icon(open?'heart':'check')}</div>
+      <div class="mt"><div class="top"><span class="t">Getaround</span><span class="tm">now</span></div>
+        <div class="pv">${latestPreview()}</div></div></div>`;
+  const past=`<div class="mcard" data-action="push-demo" data-pt="A past thank-you" data-pb="From a trip 3 weeks ago — you've helped 6 future renters since.">
+      <div class="gaav resolved">${icon("check")}</div>
+      <div class="mt"><div class="top"><span class="t">Getaround</span><span class="tm">3w</span></div>
+        <div class="pv">It's sorted! The owner gave the back seat a clean — thanks again for the heads-up. 🙌</div></div></div>`;
   return `
-  <div class="topbar"><div class="wordmark">getaround</div><div class="avatar-btn" data-action="tab" data-screen="account">M</div></div>
+  <div class="topbar"><div class="wordmark">getaround</div><div class="avatar-btn" data-action="tab" data-screen="account">${RENTER.initial}</div></div>
   <div class="pad">
-    <button class="reportcta" data-action="start-report">
-      <span class="ci">${icon("plus")}</span>
+    <button class="reportcta" data-action="start-report"><span class="ci">${icon("plus")}</span>
       <span class="ct"><b>Report an issue</b><span>Something off with your trip? Tell us.</span></span>
       <span class="arr">${icon("arrow")}</span></button>
     <div class="trip"><div class="cav">${icon("car")}</div><div style="flex:1"><div class="nm">Just back from the ${CAR.name}</div><div class="sub">${CAR.trip}</div></div></div>
-    <div class="sec"><h2>Your reports</h2><span class="count">live status</span></div>
+    <div class="sec"><h2>Messages</h2><span class="count">from Getaround</span></div>
     <div class="stagger">${active}${past}</div>
   </div>`;
 }
 
-function viewDetail(){
-  const r=state.report, s=sev(), st=steps(), cur=currentStateKey();
-  // timeline nodes
-  const nodes=st.map((key,i)=>{
-    const reached=i<=r.reached, isCur=i===Math.min(r.reached,st.length-1);
-    const m=STATE_META[key];
-    const cls = reached ? (isCur?`current on-${key}`:`done on-${key}`) : "pending";
-    const seg = STATE_META[key].color; // segment colour to next
-    return `<div class="tlnode ${cls} seg-${seg}">
-      <div class="tldot"><div class="dotc">${icon(reached?m.icon:"clock")}</div></div>
-      <div class="tlbody"><div class="tlhead"><span class="nm">${m.label}</span>${reached?`<span class="tm">${nodeTime(i)}</span>`:""}</div>
-        <div class="tlcopy">${nodeCopy(key)}</div></div></div>`;
-  }).join("");
-  // system action note
-  const note=s.sysNote;
-  const noteCls = s.offMarket ? "st-escalated" : s.catClass;
-  const noteIcon = s.offMarket ? "off" : "info";
-  const sysNote = `<div class="sysnote ${s.offMarket?'st-escalated':(s.chargeable?'st-onit':'st-received')}">${icon(noteIcon)}<span>${note.text}</span></div>`;
-  // forward trust (show once past notified)
-  const ft = r.reached>=1 ? `<div class="ftrust"><div class="fi">${icon("trend")}</div>
-      <div class="ft"><b>Issues here get sorted fast</b><span>94% of reports on this car are actioned within 7 days.</span></div></div>` : "";
-  // actions
-  let actions="";
-  if(cur==="resolved" && s.chargeable) actions=`<div class="actions"><button class="btn btn-resolved" data-action="toast" data-tt="Credit applied" data-tb="${s.credit} refunded to your original payment method.">${icon("gift")} View your ${s.credit} credit</button><button class="btn btn-soft" data-action="toast" data-tt="Reopen" data-tb="You can reopen this report any time if it's not right.">${icon("reopen")} Reopen this report</button></div>`;
-  else if(cur==="resolved") actions=`<div class="actions"><button class="btn btn-primary" data-action="toast" data-tt="Book again" data-tb="We'd take you to book this car again here.">${icon("heart")} Book this car again</button><button class="btn btn-soft" data-action="toast" data-tt="Reopen" data-tb="You can reopen this report any time if it's not right.">${icon("reopen")} Reopen this report</button></div>`;
-  else actions=`<div class="actions"><button class="btn btn-soft" data-action="toast" data-tt="Support" data-tb="A human from our team would pick this up here.">${icon("info")} Message support</button></div>`;
+function viewThread(){
+  const r=state.report, s=sev(), open=r.status==="open";
+  const pill=STATE_PILL[r.status];
+  const thumbs = r.photos ? `<div class="thumbs"><div class="photo"></div><div class="photo"></div></div>` : "";
+  // getaround resolution bubble (only when closed)
+  let resolveBubble="";
+  if(!open){
+    const isResolved=r.status==="resolved";
+    const reward = (isResolved && s.chargeable) ? `<span class="reward">${icon("gift")} ${s.credit} refunded</span>` : "";
+    const recog = isResolved ? `<span class="recog">You've helped ${TIER_HELPED[r.tier]} future renter${TIER_HELPED[r.tier]>1?"s":""} 💜</span>` : "";
+    resolveBubble=`<div class="gamsg ${isResolved?'resolved':''}"><div class="av">${icon(isResolved?'check':'heart')}</div>
+      <div class="gawrap"><div class="bubble ${isResolved?'resolved':''}">${resolveText()}${reward}${recog}</div>
+        <div class="gatime">Getaround · just now</div></div></div>`;
+  }
+  const ft = !open && r.status==="resolved" ? `<div class="ftnote">${icon("trend")}<span>Issues on cars like this get sorted fast — that's why renters keep coming back.</span></div>` : "";
+  const cta = open
+    ? `<div class="threadcta actions"><button class="btn btn-soft" data-action="push-demo" data-pt="We'll message you" data-pb="No need to check back — we'll let you know the moment it's sorted.">${icon("check")} Got it, thanks</button></div>`
+    : `<div class="threadcta actions"><button class="btn btn-soft" data-action="push-demo" data-pt="Reopened" data-pb="You can reopen any time if it's not quite right — we're still here.">${icon("reopen")} Not quite right? Reopen</button></div>`;
   return `
-  <div class="topbar"><button class="iconbtn" data-action="back">${icon("back")}</button><span class="detail-title">Your report</span></div>
-  <div class="pad">
-    <div class="summary">
-      <div class="stop"><div class="ri ${s.catClass}">${icon(s.icon)}</div>
-        <div style="flex:1;min-width:0"><div class="t">${s.exTitle}</div><div class="s">${s.label} · ${CAR.name} ${statusChip(cur)}</div></div></div>
-      ${sysNote}
-    </div>
-    <div class="sec"><h2>Progress</h2><span class="count">we'll keep you posted</span></div>
-    <div class="tl">${nodes}</div>
+  <div class="topbar"><button class="iconbtn" data-action="back">${icon("back")}</button>
+    <div class="threadhead"><div class="gaav">${icon("heart")}</div>
+      <div class="tt"><b>Getaround</b><span><span class="live"></span>On your report</span></div></div></div>
+  <div class="threadwrap">
+    <div class="daysep">Today</div>
+    <div class="myreport"><div class="top"><div class="ri ${s.catClass}">${icon(s.icon)}</div>
+      <div style="flex:1;min-width:0"><div class="t">${s.exTitle}</div><div class="meta">You reported · ${s.label} · 2:14 pm</div></div></div>
+      <div class="desc">${s.exText}</div>${thumbs}</div>
+    <div class="statepill"><span class="${pill.cls}">${pill.txt}</span></div>
+    <div class="gamsg"><div class="av">${icon("heart")}</div>
+      <div class="gawrap"><div class="bubble">${ackText()}</div><div class="gatime">Getaround · 2:14 pm</div></div></div>
+    ${resolveBubble}
     ${ft}
-    ${actions}
-  </div>`;
-}
-
-function viewNotifications(){
-  rebuildNotifications();
-  const rows = state.notifications.length ? state.notifications.map((n,i)=>`
-    <div class="nrow ${n.signature?'signature':''}" data-action="open-detail" style="animation-delay:${i*0.04}s">
-      <div class="ni st-${n.key.startsWith('reviewed')?'reviewed_no_action':n.key}">${icon(n.icon)}</div>
-      <div class="nt"><div class="t">${n.title}</div><div class="b">${n.body}</div><div class="tm">${n.time}</div></div>
-    </div>`).join("")
-    : `<div class="empty"><div class="eic">${icon("bell")}</div><h3>No notifications yet</h3><p>Updates on your reports will show up here.</p></div>`;
-  return `<div class="topbar"><span class="title">Notifications</span><div class="avatar-btn" data-action="tab" data-screen="account">M</div></div>
-    <div class="pad"><div class="sec" style="margin-top:14px"><h2>Recent</h2><span class="count">${state.notifications.length}</span></div>
-    <div>${rows}</div></div>`;
-}
-
-function viewAccount(){
-  const helped=TIER_HELPED[state.report.tier];
-  const trusted = state.report.tier==="trusted";
-  return `<div class="topbar"><span class="title">Account</span></div>
-  <div class="pad">
-    <div class="acard">
-      <div class="aprofile"><div class="av">M</div><div><div class="nm">Marie L.</div>
-        <div class="ro">Renter · Paris ${trusted?`<span class="trusted">${icon("star")} Trusted reporter</span>`:""}</div></div></div>
-      <div class="astat"><div class="b"><div class="v">${helped}</div><div class="l">future renters helped</div></div>
-        <div class="b"><div class="v">${state.report.tier==="first"?1:state.report.tier==="repeat"?5:14}</div><div class="l">reports made</div></div></div>
-    </div>
-    <div class="fnote" style="padding:0 4px">${icon("info")}Recognition over cash: a sincere thank-you and trusted-reporter status — a credit only when a chargeable defect is confirmed.</div>
+    ${cta}
   </div>`;
 }
 
 function viewFlow(){
-  const cat=state.newCat, s=SEVERITIES[cat];
+  const cat=state.report.category, s=SEVERITIES[cat];
   const cats=Object.keys(SEVERITIES).map(k=>{const c=SEVERITIES[k];
-    return `<button class="catopt ${cat===k?'sel':''}" data-action="pick-cat" data-cat="${k}">
-      <span class="ci ${c.catClass}">${icon(c.icon)}</span>
+    return `<button class="catopt ${cat===k?'sel':''}" data-action="pick-cat" data-cat="${k}"><span class="ci ${c.catClass}">${icon(c.icon)}</span>
       <span class="cl">${c.label}</span><span class="cd">${c.desc}</span></button>`;}).join("");
   return `
-  <div class="topbar"><button class="iconbtn" data-action="back">${icon("back")}</button><span class="detail-title">Report an issue</span></div>
+  <div class="topbar"><button class="iconbtn" data-action="back">${icon("back")}</button><span class="title" style="position:absolute;left:0;right:0;text-align:center;pointer-events:none">Report an issue</span></div>
   <div class="pad">
     <div class="trip" style="margin-top:14px"><div class="cav">${icon("car")}</div><div style="flex:1"><div class="nm">${CAR.name}</div><div class="sub">${CAR.trip}</div></div></div>
     <div class="flowq">What happened?</div>
-    <div class="flowsub">Pick what's closest — we'll route it the right way.</div>
+    <div class="flowsub">Pick what's closest — we'll take it from there.</div>
     <div class="catgrid">${cats}</div>
     <div class="field"><div class="lab">Tell us a bit more</div>
-      <textarea class="ta" id="reptext">${s.exText}</textarea>
-      <div class="photorow"><div class="photo"></div><div class="photo"></div><div class="addphoto" data-action="toast" data-tt="Add photo" data-tb="You'd attach more photos here.">${icon("camera")}</div></div></div>
+      <textarea class="ta">${s.exText}</textarea>
+      <div class="photorow"><div class="photo"></div><div class="photo"></div><div class="addphoto" data-action="push-demo" data-pt="Add photo" data-pb="You'd attach more photos here.">${icon("camera")}</div></div></div>
     <div class="actions"><button class="btn btn-primary" data-action="submit-report">${icon("check")} Submit report</button></div>
   </div>`;
 }
 
-/* ===================== OVERLAYS (signature moments) ===================== */
-function showAck(){
-  const m=document.getElementById("modal"); const s=sev();
-  m.innerHTML=`<div class="emoji">💛</div><h2>Thanks for flagging</h2>
-    <div class="mc">${ackCopy().replace(' 💛','')}</div>
-    <div class="mact"><button class="btn btn-primary" data-action="ack-track">${icon("reports")} Track my report</button></div>`;
-  openScrim();
+function viewAccount(){
+  const helped=TIER_HELPED[state.report.tier], trusted=state.report.tier==="trusted";
+  return `<div class="topbar"><span class="title">Account</span></div>
+  <div class="pad">
+    <div class="acard"><div class="aprofile"><div class="av">${RENTER.initial}</div><div><div class="nm">${RENTER.first} L.</div>
+      <div class="ro">Renter · Paris ${trusted?`<span class="trusted">${icon("star")} Trusted reporter</span>`:""}</div></div></div>
+      <div class="astat"><div class="b"><div class="v">${helped}</div><div class="l">future renters helped</div></div>
+        <div class="b"><div class="v">${state.report.tier==="first"?1:state.report.tier==="repeat"?5:14}</div><div class="l">reports made</div></div></div></div>
+    <div class="fnote" style="padding:0 4px">${icon("info")}A sincere thank-you and trusted-reporter status — a credit only when a charge was genuinely wrong. Recognition over cash.</div>
+  </div>`;
 }
-function showCelebrate(){
-  const s=sev(), t=state.report.tier, helped=TIER_HELPED[t];
-  const m=document.getElementById("modal");
-  const recogLine = t==="trusted" ? "You're one of our most trusted reporters." : t==="repeat" ? "Thanks for helping keep the fleet in shape." : "You rock!";
-  const credit = s.chargeable ? `<div class="credit">${icon("gift")} ${s.credit} refunded</div>` : "";
-  m.innerHTML=`<div class="confetti" id="confetti"></div>
-    <div class="emoji">🙌</div><h2>${recogLine}</h2>
-    <div class="mc">The issue you reported has been resolved — the owner ${s.consequence}.</div>
-    ${credit}
-    <div class="recog">You've helped ${helped} future renter${helped>1?"s":""} 💜</div>
-    <div class="mact"><button class="btn btn-resolved" data-action="close-overlay">${icon("check")} Lovely, thanks</button></div>`;
-  openScrim(); fireConfetti();
-}
-function fireConfetti(){
-  const c=document.getElementById("confetti"); if(!c) return;
-  const cols=["#18A06B","#7A1AA0","#11B2C6","#E08A1E","#3D6CF5"];
-  let html=""; for(let i=0;i<26;i++){ const l=Math.round((i*3.8+5)%96), d=(i%5)*0.12, col=cols[i%5], dur=1.2+(i%4)*0.25;
-    html+=`<i style="left:${l}%;background:${col};animation-delay:${d}s;animation-duration:${dur}s"></i>`; }
-  c.innerHTML=html;
-}
-function openScrim(){ document.getElementById("toast").classList.remove("show"); document.getElementById("scrim").classList.add("show"); }
-function closeScrim(){ document.getElementById("scrim").classList.remove("show"); }
 
-/* ===================== TOAST ===================== */
-function toast(title, body, colorKey){
-  const t=document.getElementById("toast"); const col=colorKey||"received";
-  t.innerHTML=`<div class="ti st-${col}">${icon("check")}</div><div class="tt"><div class="t">${title}</div><div class="b">${body}</div></div>`;
-  void t.offsetWidth; t.classList.add("show"); clearTimeout(state.toastTimer); state.toastTimer=setTimeout(()=>t.classList.remove("show"),3200);
+/* ===================== PUSH ALERT (the messaging beat) ===================== */
+function pushAlert(title, body, resolved){
+  const p=document.getElementById("push");
+  p.className="push"+(resolved?" resolved":"");
+  p.innerHTML=`<div class="pa">${icon(resolved?'check':'heart')}</div>
+    <div class="pt"><div class="h"><b>${title}</b><span class="tm">now</span></div><div class="b">${body}</div></div>`;
+  void p.offsetWidth; p.classList.add("show");
+  clearTimeout(state.pushTimer); state.pushTimer=setTimeout(()=>p.classList.remove("show"),4600);
+}
+function hidePush(){ document.getElementById("push").classList.remove("show"); }
+function fireConfetti(){
+  const c=document.getElementById("confetti"); const cols=["#18A06B","#7A1AA0","#11B2C6","#E08A1E","#B43A9E"];
+  let html=""; for(let i=0;i<28;i++){ const l=Math.round((i*3.5+4)%96), d=(i%6)*0.1, col=cols[i%5], dur=1.3+(i%4)*0.22;
+    html+=`<i style="left:${l}%;background:${col};animation-delay:${d}s;animation-duration:${dur}s"></i>`; }
+  c.innerHTML=html; setTimeout(()=>{c.innerHTML="";},2600);
 }
 
 /* ===================== ACTIONS ===================== */
-function startReport(){ state.newCat=state.report.category; setState({screen:"flow"},{screenChange:true}); }
+function startReport(){ setState({screen:"flow"},{screenChange:true}); }
 function submitReport(){
-  setReport({category:state.newCat, branch:"resolve", reached:0});
-  setState({screen:"detail"},{screenChange:true});
-  setTimeout(showAck, 260);
+  setReport({status:"open"});
+  setState({screen:"thread"},{screenChange:true});
+  setTimeout(()=>pushAlert("Getaround", stripTags(ackText()), false), 360);
 }
-function advance(){
-  if(isTerminalReached()) return;
-  setReport({reached: state.report.reached+1});
-  const cur=currentStateKey();
-  if(state.screen!=="detail"){ state.screen="detail"; }
+function sendReply(){
+  setReport({status:state.outcome});
+  if(state.screen!=="thread") state.screen="thread";
   render({});
-  if(cur==="resolved") setTimeout(showCelebrate, 220);
-  else { const m=STATE_META[cur]; toast(m.label, stripTags(nodeCopy(cur)).slice(0,70)+"…", m.color); }
+  const resolved=state.report.status==="resolved";
+  if(resolved) fireConfetti();
+  const title = resolved?"Your report is sorted 🙌" : state.report.status==="escalated"?"We're making sure it's sorted" : "We looked into your report";
+  setTimeout(()=>pushAlert(title, stripTags(resolveText()), resolved), 200);
+  // scroll thread to bottom
+  setTimeout(()=>{ const a=document.getElementById("app"); a.scrollTop=a.scrollHeight; }, 120);
 }
-function setBranch(b){
-  // keep received+notified, reset terminal so it can be advanced into
-  const newReached=Math.min(state.report.reached, 1);
-  setReport({branch:b, reached:newReached});
-  setState({});
-}
-function restartLoop(){ setReport({reached:0, branch:state.report.branch}); setState({}); }
+function replay(){ setReport({status:"open"}); setState({screen:"thread"},{screenChange:true}); setTimeout(()=>pushAlert("Getaround", stripTags(ackText()), false), 360); }
 
 /* ===================== RENDER ===================== */
-const TABS=[{s:"reports",ic:"reports",l:"Reports"},{s:"notifications",ic:"bell",l:"Alerts"},{s:"account",ic:"person",l:"Account"}];
+const TABS=[{s:"inbox",ic:"inbox",l:"Inbox"},{s:"account",ic:"person",l:"Account"}];
 function render(opts){
   opts=opts||{};
   const app=document.getElementById("app"), screen=document.getElementById("screen");
   const prevScroll=app?app.scrollTop:0;
-  app.innerHTML = state.screen==="detail"?viewDetail() : state.screen==="flow"?viewFlow() :
-                  state.screen==="notifications"?viewNotifications() : state.screen==="account"?viewAccount() : viewReports();
-  screen.classList.toggle("detail", state.screen==="detail");
+  app.innerHTML = state.screen==="thread"?viewThread() : state.screen==="flow"?viewFlow() : state.screen==="account"?viewAccount() : viewInbox();
+  screen.classList.toggle("detail", state.screen==="thread");
   screen.classList.toggle("flow", state.screen==="flow");
-  const hideNav = state.screen==="detail"||state.screen==="flow";
   document.getElementById("tabbar").innerHTML = TABS.map(t=>{
-    const active=state.screen===t.s||(t.s==="reports"&&(state.screen==="detail"||state.screen==="flow"));
-    rebuildNotifications();
-    const dot = t.s==="notifications" && state.notifications.length ? `<span class="dot"></span>`:"";
+    const active=state.screen===t.s||(t.s==="inbox"&&(state.screen==="thread"||state.screen==="flow"));
+    const dot = t.s==="inbox" ? `<span class="dot"></span>`:"";
     return `<div class="tab ${active?'active':''}" data-action="tab" data-screen="${t.s}">${dot}${icon(t.ic)}<span>${t.l}</span></div>`;
   }).join("");
   if(opts.screenChange&&app.firstElementChild){ const c=app.children[1]||app.firstElementChild; c.classList.add("screen-enter"); }
@@ -659,19 +507,10 @@ function render(opts){
   renderConsole();
 }
 function renderConsole(){
-  // severity
   document.getElementById("c-sev").innerHTML=Object.keys(SEVERITIES).map(k=>{const c=SEVERITIES[k];
     return `<button class="cbtn ${state.report.category===k?'on':''}" data-action="set-sev" data-k="${k}">${icon(c.icon)}${c.short}</button>`;}).join("");
-  // branch
-  const branches=[["resolve","Owner resolves"],["noaction","No fix needed"],["escalate","Owner ghosts"]];
-  document.getElementById("c-branch").innerHTML=branches.map(b=>`<button class="cbtn ${state.report.branch===b[0]?'on':''}" data-action="set-branch" data-b="${b[0]}">${b[1]}</button>`).join("");
-  // current state readout
-  const cur=currentStateKey(), m=STATE_META[cur];
-  document.getElementById("c-state").innerHTML=`<span class="d" style="background:var(--${m.color})"></span>${m.label}`;
-  document.getElementById("c-next").disabled=isTerminalReached();
-  // tier
+  document.getElementById("c-outcome").innerHTML=Object.keys(OUTCOMES).map(k=>`<button class="cbtn ${state.outcome===k?'on':''}" data-action="set-outcome" data-k="${k}">${OUTCOMES[k]}</button>`).join("");
   document.getElementById("c-tier").innerHTML=Object.keys(TIERS).map(k=>`<button class="cbtn ${state.report.tier===k?'on':''}" data-action="set-tier" data-k="${k}">${TIERS[k]}</button>`).join("");
-  // latency
   document.getElementById("c-latency").innerHTML=[["fast","Fast"],["slow","Slow"]].map(l=>`<button class="cbtn ${state.report.latency===l[0]?'on':''}" data-action="set-latency" data-k="${l[0]}">${l[1]}</button>`).join("");
 }
 
@@ -681,24 +520,21 @@ document.addEventListener("click",e=>{
   const a=el.getAttribute("data-action");
   switch(a){
     case "tab": setState({screen:el.getAttribute("data-screen")},{screenChange:true}); break;
-    case "open-detail": setState({screen:"detail"},{screenChange:true}); break;
-    case "back": setState({screen:"reports"},{screenChange:true}); break;
+    case "open-thread": hidePush(); setState({screen:"thread"},{screenChange:true}); break;
+    case "back": setState({screen:"inbox"},{screenChange:true}); break;
     case "start-report": startReport(); break;
-    case "pick-cat": state.newCat=el.getAttribute("data-cat"); render({}); break;
+    case "pick-cat": setReport({category:el.getAttribute("data-cat")}); render({}); break;
     case "submit-report": submitReport(); break;
-    case "ack-track": closeScrim(); break;
-    case "close-overlay": closeScrim(); break;
-    case "advance": advance(); break;
+    case "send-reply": sendReply(); break;
+    case "reset-open": setReport({status:"open"}); setState({}); break;
+    case "replay": replay(); break;
     case "set-sev": setReport({category:el.getAttribute("data-k")}); setState({}); break;
-    case "set-branch": setBranch(el.getAttribute("data-b")); break;
+    case "set-outcome": setState({outcome:el.getAttribute("data-k")}); break;
     case "set-tier": setReport({tier:el.getAttribute("data-k")}); setState({}); break;
     case "set-latency": setReport({latency:el.getAttribute("data-k")}); setState({}); break;
-    case "restart-loop": restartLoop(); break;
-    case "resubmit": setState({screen:"reports"}); startReport(); break;
-    case "toast": toast(el.getAttribute("data-tt"), el.getAttribute("data-tb"), "received"); break;
+    case "push-demo": pushAlert(el.getAttribute("data-pt"), el.getAttribute("data-pb"), false); break;
   }
 });
-document.getElementById("scrim").addEventListener("click",e=>{ if(e.target.id==="scrim") closeScrim(); });
 render({});
 </script>
 </body>
