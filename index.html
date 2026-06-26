@@ -454,7 +454,7 @@ function viewThread(){
   }
   const ft = !open && r.status==="resolved" ? `<div class="ftnote">${icon("trend")}<span>94% of reports here are sorted within a week.</span></div>` : "";
   const cta = open
-    ? `<div class="threadcta actions"><button class="btn btn-soft" data-action="push-demo" data-pt="We'll message you" data-pb="No need to check back — we'll let you know the moment it's sorted.">${icon("check")} Got it, thanks</button></div>`
+    ? `<div class="threadcta actions"><button class="btn btn-soft" data-action="push-demo" data-pt="We'll message you" data-pb="No need to check back — we'll message you the second it's sorted.">${icon("check")} Got it, thanks</button></div>`
     : `<div class="threadcta actions"><button class="btn btn-soft" data-action="push-demo" data-pt="Reopened" data-pb="You can reopen any time if it's not quite right — we're still here.">${icon("reopen")} Not quite right? Reopen</button></div>`;
   return `
   <div class="topbar"><button class="iconbtn" data-action="back">${icon("back")}</button>
