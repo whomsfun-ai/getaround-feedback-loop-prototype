@@ -155,8 +155,6 @@ body{font-family:var(--sans);color:var(--ink);background:#E9E7EE;
 .bubble{background:#fff;border:1px solid var(--line);border-radius:5px 18px 18px 18px;padding:13px 15px;box-shadow:var(--shadow);font-size:14px;color:var(--ink);font-weight:500;line-height:1.55;max-width:90%;}
 .bubble b{font-weight:800;}
 .bubble.resolved{background:var(--resolved-tint);border-color:rgba(24,160,107,.25);}
-.bubble .reward{display:inline-flex;align-items:center;gap:7px;margin-top:12px;background:#fff;border:1px solid rgba(24,160,107,.3);color:var(--resolved-700);font-weight:800;font-size:12.5px;padding:7px 12px;border-radius:99px;}
-.bubble .reward svg{width:15px;height:15px;}
 .bubble .recog{display:block;margin-top:11px;font-size:12.5px;font-weight:800;color:var(--brand);}
 .gatime{font-size:11px;color:var(--ink-3);font-weight:700;margin-top:6px;margin-left:3px;}
 /* forward trust (a soft closing note, not a bubble) */
@@ -289,16 +287,16 @@ const CAR={name:"Renault Clio", trip:"Trip ended · today, 2:14 pm"};
 const SEVERITIES={
   cleanliness:{label:"Cleanliness", short:"Cleanliness", icon:"sparkle", catClass:"cat-cleanliness", desc:"Dirty, or a smell",
     exTitle:"Cigarette smell in the cabin", exText:"There was a strong stale-cigarette smell, especially in the front seats.",
-    consequence:"gave the car a deep re-clean and confirmed it's fresh again", chargeable:false},
+    consequence:"gave the car a deep re-clean and confirmed it's fresh again"},
   safety:{label:"Safety", short:"Safety", icon:"alert", catClass:"cat-safety", desc:"Mechanical or unsafe",
     exTitle:"Warning light on the dash", exText:"An orange engine warning light came on during the trip.",
-    consequence:"had it checked over and confirmed it's all good to drive again", chargeable:false, offMarket:true},
+    consequence:"had it checked over and confirmed it's all good to drive again", offMarket:true},
   equipment:{label:"Equipment", short:"Equipment", icon:"clipboard", catClass:"cat-equipment", desc:"Missing / not as listed",
     exTitle:"No phone holder as listed", exText:"The listing mentioned a phone holder but there wasn't one in the car.",
-    consequence:"sorted the listing so the next renter knows exactly what to expect", chargeable:false},
+    consequence:"sorted the listing so the next renter knows exactly what to expect"},
   billing:{label:"Billing", short:"Billing", icon:"euro", catClass:"cat-billing", desc:"A charge looks wrong",
-    exTitle:"Cleaning fee I shouldn't have", exText:"I returned the car clean but was charged a €35 cleaning fee.",
-    consequence:"reviewed the charge and put it right", chargeable:true, credit:"€35"},
+    exTitle:"A charge I didn't expect", exText:"There was a cleaning fee on my trip that I wasn't expecting.",
+    consequence:"looked into the charge with the owner and cleared it up for you"},
 };
 const OUTCOMES={resolved:"Resolved", noaction:"No fix needed", escalated:"Our team steps in"};
 const TIERS={first:"First-time", repeat:"Repeat", trusted:"Trusted"};
@@ -354,8 +352,7 @@ function resolveText(){ const s=sev(), t=state.report.tier, slow=state.report.la
   // resolved
   const lead = slow ? `Sorry this took a little longer than we'd like — but it's done. ` : ``;
   const recog = t==="trusted" ? `you're one of our most trusted reporters` : t==="repeat" ? `thanks for helping keep our cars great` : `you rock`;
-  const credit = s.chargeable ? ` We've refunded the <b>${s.credit}</b> to your account.` : ``;
-  return `${lead}Good news, ${RENTER.first} — it's sorted! ✨ We ${s.consequence}. Thanks again for taking the time to flag it — ${recog}! 🙌${credit}`;
+  return `${lead}Good news, ${RENTER.first} — it's sorted! ✨ We ${s.consequence}. Thanks again for taking the time to flag it — ${recog}! 🙌`;
 }
 function latestPreview(){ return state.report.status==="open" ? stripTags(ackText()) : stripTags(resolveText()); }
 function stripTags(s){ return s.replace(/<[^>]+>/g,""); }
@@ -392,10 +389,9 @@ function viewThread(){
   let resolveBubble="";
   if(!open){
     const isResolved=r.status==="resolved";
-    const reward = (isResolved && s.chargeable) ? `<span class="reward">${icon("gift")} ${s.credit} refunded</span>` : "";
     const recog = isResolved ? `<span class="recog">You've helped ${TIER_HELPED[r.tier]} future renter${TIER_HELPED[r.tier]>1?"s":""} 💜</span>` : "";
     resolveBubble=`<div class="gamsg ${isResolved?'resolved':''}"><div class="av">${icon(isResolved?'check':'heart')}</div>
-      <div class="gawrap"><div class="bubble ${isResolved?'resolved':''}">${resolveText()}${reward}${recog}</div>
+      <div class="gawrap"><div class="bubble ${isResolved?'resolved':''}">${resolveText()}${recog}</div>
         <div class="gatime">Getaround · just now</div></div></div>`;
   }
   const ft = !open && r.status==="resolved" ? `<div class="ftnote">${icon("trend")}<span>Issues on cars like this get sorted fast — that's why renters keep coming back.</span></div>` : "";
@@ -447,7 +443,7 @@ function viewAccount(){
       <div class="ro">Renter · Paris ${trusted?`<span class="trusted">${icon("star")} Trusted reporter</span>`:""}</div></div></div>
       <div class="astat"><div class="b"><div class="v">${helped}</div><div class="l">future renters helped</div></div>
         <div class="b"><div class="v">${state.report.tier==="first"?1:state.report.tier==="repeat"?5:14}</div><div class="l">reports made</div></div></div></div>
-    <div class="fnote" style="padding:0 4px">${icon("info")}A sincere thank-you and trusted-reporter status — a credit only when a charge was genuinely wrong. Recognition over cash.</div>
+    <div class="fnote" style="padding:0 4px">${icon("info")}Just a sincere thank-you and trusted-reporter status — recognition for helping keep our cars great. No rewards, no catch.</div>
   </div>`;
 }
 
